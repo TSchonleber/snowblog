@@ -35,6 +35,7 @@ def generate_image_fal(prompt, fal_model, max_steps=50):
                 "enable_safety_checker": False
             }
         )
+        print(f"FAL AI result: {result}")  # Add this line for debugging
         image_url = result['images'][0]['url']
         response = requests.get(image_url)
         img = Image.open(BytesIO(response.content))
@@ -45,7 +46,7 @@ def generate_image_fal(prompt, fal_model, max_steps=50):
     except Exception as e:
         print(f"Error generating image with FAL AI: {str(e)}")
         print(f"Full error details: {e.response.text if hasattr(e, 'response') else 'No additional details'}")
-        return None
+        raise  # Re-raise the exception to be caught in the calling function
 
 def generate_image_openai(prompt):
     print(f"Attempting to generate image with DALL-E. Prompt: {prompt}")
@@ -109,7 +110,7 @@ def text_chat(message, history, model):
 def generate_image(prompt, model):
     print(f"generate_image called with prompt: '{prompt}', model: '{model}'")
     if model.startswith("fal-") or model == "flux-dev":
-        if model == "fal-flux-dev1" or model == "flux-dev":
+        if model == "flux-dev":
             fal_model = "fal-ai/flux"
         elif model == "fal-flux-schnell":
             fal_model = "fal-ai/flux/schnell"
@@ -123,7 +124,8 @@ def generate_image(prompt, model):
             fal_model = "fal-ai/flux"  # Default to flux if not recognized
         image_data = generate_image_fal(prompt, fal_model)
     else:
-        # For any non-FAL model, default to FAL's flux
+        # This else block should never be reached with your current frontend options
+        print(f"Warning: Unsupported model '{model}'. Defaulting to fal-ai/flux.")
         image_data = generate_image_fal(prompt, "fal-ai/flux")
     
     if image_data is None:

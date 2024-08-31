@@ -6,7 +6,7 @@ function SnowAI() {
   const { user } = useAuth();
   const [textInput, setTextInput] = useState('');
   const [imageInput, setImageInput] = useState('');
-  const [selectedModel, setSelectedModel] = useState('dall-e-3');
+  const [selectedModel, setSelectedModel] = useState('flux-dev');
   const [textOutput, setTextOutput] = useState('');
   const [imageOutput, setImageOutput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -34,10 +34,10 @@ function SnowAI() {
         prompt: imageInput,
         model: selectedModel
       });
-      if (response.data.image_url) {
-        setImageOutput(response.data.image_url);
+      if (response.data.image_data) {
+        setImageOutput(response.data.image_data);
       } else {
-        throw new Error('No image URL received');
+        throw new Error('No image data received');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -98,7 +98,7 @@ function SnowAI() {
         {imageOutput && (
           <div className="ai-output">
             <h4>Generated Image:</h4>
-            {typeof imageOutput === 'string' && imageOutput.startsWith('http') ? (
+            {typeof imageOutput === 'string' && imageOutput.startsWith('data:image/') ? (
               <img src={imageOutput} alt="AI Generated" className="ai-image" />
             ) : (
               <p>{imageOutput}</p>

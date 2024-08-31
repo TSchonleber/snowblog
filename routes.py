@@ -194,7 +194,7 @@ def ai_image_response():
             return jsonify({"image_data": f"data:image/png;base64,{img_str}"})
         else:
             logging.error("Failed to generate image: No image data returned")
-            return jsonify({"error": "Failed to generate image"}), 500
+            return jsonify({"error": "Failed to generate image: No image data returned"}), 500
     except Exception as e:
         logging.error(f"AI API error: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Failed to generate image: {str(e)}"}), 500
