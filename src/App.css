@@ -1,0 +1,241 @@
+:root {
+  --primary-color: #00ff00;
+  --secondary-color: #1a1a1a;
+  --background-color: #121212;
+  --text-color: #e0e0e0;
+  --accent-color: #00ccff;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: 'Courier New', monospace;
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.App-header {
+  background-color: var(--secondary-color);
+  padding: 20px;
+  border-bottom: 2px solid var(--primary-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.App-header h1 {
+  color: var(--primary-color);
+  font-size: 2.5em;
+  margin: 0;
+  text-shadow: 0 0 10px var(--primary-color);
+}
+
+.App-nav {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-link {
+  color: var(--text-color);
+  text-decoration: none;
+  padding: 5px 10px;
+  border: 1px solid var(--primary-color);
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+.App-main {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: rgba(26, 26, 26, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+}
+
+.home-page {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.post {
+  background-color: var(--secondary-color);
+  padding: 20px;
+  border-radius: 5px;
+  border-left: 4px solid var(--accent-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.post h3 {
+  color: var(--accent-color);
+  margin-top: 0;
+}
+
+.post-content {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.post-image, .post-video, iframe {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.post-date {
+  color: var(--accent-color);
+  font-size: 0.9em;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.post-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.edit-btn, .delete-btn {
+  padding: 5px 10px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.edit-btn {
+  background-color: var(--accent-color);
+  color: var(--secondary-color);
+}
+
+.delete-btn {
+  background-color: #ff4444;
+  color: var(--secondary-color);
+}
+
+.edit-btn:hover, .delete-btn:hover {
+  opacity: 0.8;
+}
+
+.about-me-page {
+  background-color: var(--secondary-color);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+}
+
+.social-links ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.social-links li {
+  margin-bottom: 10px;
+}
+
+.social-links a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+  color: var(--primary-color);
+  text-shadow: 0 0 5px var(--primary-color);
+}
+
+.post-actions {
+  margin-top: 10px;
+}
+
+.edit-post-page {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.auth-page {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: var(--secondary-color);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.auth-form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-form label {
+  margin-bottom: 5px;
+  color: var(--primary-color);
+}
+
+.auth-form input {
+  padding: 8px;
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.auth-form .submit-btn {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.auth-form .submit-btn:hover {
+  background-color: var(--accent-color);
+}
+
+.auth-link {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.auth-link a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.auth-link a:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  color: #ff4444;
+  margin-bottom: 10px;
+  text-align: center;
+}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Welcome to the Blog</h1>
+    {% if posts %}
+        {% for post in posts %}
+            <article class="card mb-3">
+                <div class="card-body">
+                    <h2 class="card-title">{{ post.title }}</h2>
+                    <p class="card-text">{{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}</p>
+                    {% if post.image_url %}
+                        <img src="{{ post.image_url }}" alt="{{ post.title }}" class="img-fluid mb-2">
+                    {% endif %}
+                    <p class="card-text"><small class="text-muted">Posted on: {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small></p>
+                    <a href="{{ url_for('view_post', post_id=post.id) }}" class="btn btn-primary">Read More</a>
+                </div>
+            </article>
+        {% endfor %}
+    {% else %}
+        <p>No posts available.</p>
+    {% endif %}
+{% endblock %}
