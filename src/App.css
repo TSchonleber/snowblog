@@ -1,241 +1,167 @@
 :root {
-  --primary-color: #00ff00;
-  --secondary-color: #1a1a1a;
-  --background-color: #121212;
+  --background-color: #0a0e17;
+  --primary-color: #00ff9d;
+  --secondary-color: #0d1117;
   --text-color: #e0e0e0;
-  --accent-color: #00ccff;
+  --accent-color: #ff00ff;
+  --header-color: #1a1e26;
 }
 
 body {
   background-color: var(--background-color);
   color: var(--text-color);
-  font-family: 'Courier New', monospace;
+  font-family: 'Roboto Mono', monospace;
   margin: 0;
   padding: 0;
+  line-height: 1.6;
 }
 
 .App {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .App-header {
-  background-color: var(--secondary-color);
-  padding: 20px;
-  border-bottom: 2px solid var(--primary-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  background-color: var(--header-color);
+  padding: 1rem 2rem;
+  color: var(--primary-color);
+  box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
 }
 
 .App-header h1 {
-  color: var(--primary-color);
-  font-size: 2.5em;
   margin: 0;
-  text-shadow: 0 0 10px var(--primary-color);
-}
-
-.App-nav {
-  display: flex;
-  gap: 20px;
-}
-
-.nav-link {
-  color: var(--text-color);
-  text-decoration: none;
-  padding: 5px 10px;
-  border: 1px solid var(--primary-color);
-  border-radius: 5px;
-  transition: all 0.3s ease;
-}
-
-.nav-link:hover {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-}
-
-.App-main {
-  margin-top: 20px;
-  padding: 20px;
-  background-color: rgba(26, 26, 26, 0.8);
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-}
-
-.home-page {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  padding: 20px 0;
-}
-
-.post {
-  background-color: var(--secondary-color);
-  padding: 20px;
-  border-radius: 5px;
-  border-left: 4px solid var(--accent-color);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.post h3 {
-  color: var(--accent-color);
-  margin-top: 0;
-}
-
-.post-content {
-  flex-grow: 1;
-  overflow: hidden;
-}
-
-.post-image, .post-video, iframe {
-  width: 100%;
-  max-height: 200px;
-  object-fit: cover;
-  border-radius: 5px;
-  margin-top: 10px;
-}
-
-.post-date {
-  color: var(--accent-color);
-  font-size: 0.9em;
-  margin-top: auto;
-  padding-top: 10px;
-}
-
-.post-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.edit-btn, .delete-btn {
-  padding: 5px 10px;
-  margin-right: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.edit-btn {
-  background-color: var(--accent-color);
-  color: var(--secondary-color);
-}
-
-.delete-btn {
-  background-color: #ff4444;
-  color: var(--secondary-color);
-}
-
-.edit-btn:hover, .delete-btn:hover {
-  opacity: 0.8;
-}
-
-.about-me-page {
-  background-color: var(--secondary-color);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-}
-
-.social-links ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.social-links li {
-  margin-bottom: 10px;
-}
-
-.social-links a {
-  color: var(--accent-color);
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.social-links a:hover {
-  color: var(--primary-color);
+  font-size: 2rem;
   text-shadow: 0 0 5px var(--primary-color);
 }
 
-.post-actions {
-  margin-top: 10px;
+.App-header nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
 }
 
-.edit-post-page {
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.App-header a, .App-header button {
+  color: var(--text-color);
+  text-decoration: none;
+  margin: 0 10px;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
 }
 
-.auth-page {
-  max-width: 400px;
+.App-header a:hover, .App-header button:hover {
+  background-color: rgba(0, 255, 157, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+}
+
+.App-main {
+  flex: 1;
+  display: flex;
+  padding: 2rem;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  width: 100%;
+}
+
+.App-sidebar {
+  width: 250px;
+  padding: 1rem;
   background-color: var(--secondary-color);
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
-}
-
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.auth-form .form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.auth-form label {
-  margin-bottom: 5px;
-  color: var(--primary-color);
-}
-
-.auth-form input {
-  padding: 8px;
+  margin-left: 2rem;
   border: 1px solid var(--primary-color);
-  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 255, 157, 0.1);
+}
+
+.ai-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.ai-section {
+  margin-bottom: 2rem;
+  background-color: var(--secondary-color);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
+  border: 1px solid var(--primary-color);
+}
+
+.ai-page textarea, .ai-page select {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
   background-color: var(--background-color);
   color: var(--text-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
 }
 
-.auth-form .submit-btn {
+.ai-output {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: var(--background-color);
+  border-radius: 4px;
+  border: 1px solid var(--accent-color);
+}
+
+.ai-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  border: 1px solid var(--accent-color);
+}
+
+button {
   background-color: var(--primary-color);
-  color: var(--secondary-color);
-  padding: 10px;
+  color: var(--background-color);
   border: none;
+  padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
+  transition: all 0.3s ease;
   font-weight: bold;
-  transition: background-color 0.3s ease;
 }
 
-.auth-form .submit-btn:hover {
+button:hover {
   background-color: var(--accent-color);
+  box-shadow: 0 0 10px var(--accent-color);
 }
 
-.auth-link {
-  margin-top: 15px;
-  text-align: center;
+h1, h2, h3, h4, h5, h6 {
+  color: var(--primary-color);
+  text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
 }
 
-.auth-link a {
-  color: var(--accent-color);
-  text-decoration: none;
+@media (max-width: 768px) {
+  .App-main {
+    flex-direction: column;
+  }
+
+  .App-sidebar {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 2rem;
+  }
 }
 
-.auth-link a:hover {
-  text-decoration: underline;
+/* Add some cyberpunk-style glowing effects */
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px var(--primary-color);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--primary-color), 0 0 30px var(--accent-color);
+  }
+  100% {
+    box-shadow: 0 0 5px var(--primary-color);
+  }
 }
 
-.error-message {
-  color: #ff4444;
-  margin-bottom: 10px;
-  text-align: center;
+.ai-section:hover {
+  animation: glow 1.5s infinite alternate;
 }

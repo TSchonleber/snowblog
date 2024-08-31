@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../api/axios';
 
 function LoginPage() {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
@@ -14,10 +15,12 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     try {
-      await login(credentials.username, credentials.password);
-      navigate('/');
+      const response = await api.post('/auth/login', credentials);
+      if (response.data.message === 'Logged in successfully') {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        navigate('/');
+      }
     } catch (error) {
       setError('Invalid username or password');
     }

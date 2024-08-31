@@ -7,6 +7,11 @@ import os
 import logging
 import re
 from flask_login import login_required, current_user
+import openai
+from ai_utils import generate_image, text_chat
+from openai import OpenAI
+from io import BytesIO
+import base64
 
 bp = Blueprint('main', __name__)
 
@@ -17,6 +22,8 @@ def extract_youtube_id(url):
     youtube_regex = r'(https?://)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)/(watch\?v=|embed/|v/|.+\?v=)?(?P<id>[A-Za-z0-9\-=_]{11})'
     match = re.match(youtube_regex, url)
     return match.group('id') if match else None
+
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 @bp.route('/')
 def home():
@@ -146,3 +153,48 @@ def api_post(post_id):
         db.session.delete(post)
         db.session.commit()
         return '', 204
+
+@bp.route('/api/ai/text', methods=['POST'])
+@login_required
+def ai_text_response():
+    data = request.get_json()
+    message = data.get('message')
+    history = data.get('history', [])
+    model = data.get('model', 'gpt-3.5-turbo')
+
+    if not message:
+        return jsonify({"error": "No message provided"}), 400
+
+    try:
+        updated_history = text_chat(message, history, model)
+        return jsonify({"history": updated_history})
+    except Exception as e:
+        logging.error(f"AI API error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@bp.route('/api/ai/image', methods=['POST'])
+@login_required
+def ai_image_response():
+    data = request.get_json()
+    prompt = data.get('prompt')
+    model = data.get('model', 'flux-dev')
+    
+    logging.info(f"Received request for model: {model}, prompt: {prompt}")
+    
+    if not prompt:
+        return jsonify({"error": "No prompt provided"}), 400
+
+    try:
+        image_data = generate_image(prompt, model)
+        if image_data:
+            # Convert PIL Image to base64 string
+            buffered = BytesIO()
+            image_data.save(buffered, format="PNG")
+            img_str = base64.b64encode(buffered.getvalue()).decode()
+            return jsonify({"image_data": f"data:image/png;base64,{img_str}"})
+        else:
+            logging.error("Failed to generate image: No image data returned")
+            return jsonify({"error": "Failed to generate image"}), 500
+    except Exception as e:
+        logging.error(f"AI API error: {str(e)}")
+        return jsonify({"error": str(e)}), 500

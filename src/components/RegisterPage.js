@@ -14,22 +14,26 @@ function RegisterPage() {
     e.preventDefault();
     setError('');
     try {
+      console.log('Sending registration request:', user);
       const response = await fetch('http://localhost:5000/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(user),
+        credentials: 'include'
       });
+      console.log('Registration response status:', response.status);
+      const data = await response.json();
+      console.log('Registration response data:', data);
       if (response.ok) {
         navigate('/login');
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'An error occurred during registration.');
+        setError(data.error || 'An error occurred during registration.');
       }
     } catch (error) {
       console.error('Error during registration:', error);
-      setError('An error occurred during registration.');
+      setError('An error occurred during registration. Please try again.');
     }
   };
 

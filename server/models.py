@@ -1,8 +1,9 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from server import db
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from . import db
+from itsdangerous import URLSafeTimedSerializer as Serializer
 from flask import current_app
+from datetime import datetime, timedelta
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -18,14 +19,17 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def get_reset_token(self, expires_sec=1800):
-        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
-        return s.dumps({'user_id': self.id}).decode('utf-8')
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id, 'exp': datetime.utcnow() + timedelta(seconds=expires_sec)})
 
     @staticmethod
     def verify_reset_token(token):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
-            user_id = s.loads(token)['user_id']
+            data = s.loads(token)
+            if datetime.utcnow() > datetime.utcfromtimestamp(data['exp']):
+                return None
+            user_id = data['user_id']
         except:
             return None
         return User.query.get(user_id)
@@ -35,7 +39,7 @@ class Post(db.Model):
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(200))
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('posts', lazy=True))
 
