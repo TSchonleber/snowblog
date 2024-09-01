@@ -1,16 +1,20 @@
 :root {
   --background-color: #0a0e17;
   --primary-color: #00ffff;
-  --secondary-color: #00ff00;
+  --secondary-color: #1a1e26;
   --text-color: #e0e0e0;
   --accent-color: #0077ff;
   --header-color: #1a1e26;
+  --darker-bg: #050508;
+  --scrollbar-width: 12px;
+  --scrollbar-track: #1a1e26;
+  --scrollbar-thumb: #00ffff;
 }
 
 body {
   background-color: var(--background-color);
   color: var(--text-color);
-  font-family: 'Orbitron', 'Roboto Mono', monospace;
+  font-family: 'Orbitron', sans-serif;
   margin: 0;
   padding: 0;
   line-height: 1.6;

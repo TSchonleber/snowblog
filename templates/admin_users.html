@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>User Management</h1>
+{% if users %}
+    <p>Number of users: {{ users|length }}</p>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Admin</th>
+            <th>Actions</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
+            <td>
+                <a href="{{ url_for('edit_user', user_id=user.id) }}">Edit</a>
+                <form action="{{ url_for('delete_user', user_id=user.id) }}" method="post" style="display: inline;">
+                    <input type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete this user?');">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No users found.</p>
+{% endif %}
+{% endblock %}

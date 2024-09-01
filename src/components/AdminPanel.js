@@ -1,13 +1,17 @@
 import React from 'react';
-import UserManagement from './UserManagement';
+import AdminUserManagement from './AdminUserManagement';
+import './AdminPanel.css'; // Create this file if it doesn't exist
 
-function AdminPanel() {
+const AdminPanel = () => {
   return (
     <div className="admin-panel">
-      <h2>Admin Panel</h2>
-      <UserManagement />
+      <h1>Admin Panel</h1>
+      <div className="admin-section">
+        <AdminUserManagement />
+      </div>
+      {/* Other admin panel sections */}
     </div>
   );
-}
+};
 
 export default AdminPanel;
