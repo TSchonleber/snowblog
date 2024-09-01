@@ -1,0 +1,51 @@
+.App-header {
+  background-color: rgba(26, 30, 38, 0.8);
+  padding: 10px 20px;
+  color: var(--primary-color);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left .site-title {
+  text-decoration: none;
+}
+
+.header-left h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
+  letter-spacing: 2px;
+  color: var(--primary-color);
+  transition: all 0.3s ease;
+}
+
+.header-left h1:hover {
+  text-shadow: 0 0 15px var(--primary-color), 0 0 25px var(--primary-color);
+}
+
+.header-nav {
+  display: flex;
+  gap: 20px;
+}
+
+.header-nav a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.header-nav a:hover,
+.header-nav a.active {
+  text-shadow: 0 0 10px var(--primary-color);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}

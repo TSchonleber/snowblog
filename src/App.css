@@ -609,22 +609,21 @@ h1, h2, h3, h4, h5, h6 {
   position: fixed;
   bottom: 20px;
   left: 20px;
-  background-color: var(--primary-color);
-  color: var(--background-color);
-  border: none;
+  background-color: rgba(0, 255, 255, 0.2);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
   padding: 10px 20px;
   border-radius: 20px;
   cursor: pointer;
   z-index: 1001;
   font-size: 16px;
-  box-shadow: 0 2px 10px rgba(0, 255, 157, 0.3);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
   transition: all 0.3s ease;
 }
 
 .about-me-button:hover {
-  background-color: var(--accent-color);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 255, 157, 0.5);
+  background-color: rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
 }
 
 .about-me-container {
@@ -644,22 +643,21 @@ h1, h2, h3, h4, h5, h6 {
   position: fixed;
   bottom: 20px;
   left: 20px;
-  background-color: var(--primary-color);
-  color: var(--background-color);
-  border: none;
+  background-color: rgba(0, 255, 255, 0.2);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
   padding: 10px 20px;
   border-radius: 20px;
   cursor: pointer;
   z-index: 1001;
   font-size: 16px;
-  box-shadow: 0 2px 10px rgba(0, 255, 157, 0.3);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
   transition: all 0.3s ease;
 }
 
 .about-me-button:hover {
-  background-color: var(--accent-color);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 255, 157, 0.5);
+  background-color: rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
 }
 
 /* Add these new styles for enhanced cyberpunk look */
@@ -720,3 +718,48 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Add more cyberpunk-inspired styles as needed */
+
+.new-post-button {
+  position: fixed;
+  bottom: 80px; /* Position it above the About Me button */
+  left: 20px;
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+.new-post-button:hover {
+  background-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+}
+
+.about-me-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: rgba(0, 255, 255, 0.2);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  z-index: 1001;
+  font-size: 16px;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.about-me-button:hover {
+  background-color: rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}

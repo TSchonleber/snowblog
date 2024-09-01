@@ -7,11 +7,17 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
-    password_hash = db.Column(db.String(128))  # Increased to 128
+    password_hash = db.Column(db.String(256))
     reset_token = db.Column(db.String(100), unique=True, nullable=True)
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     is_approved = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)
+    display_name = db.Column(db.String(100), nullable=True)
+    bio = db.Column(db.Text, nullable=True)
+    location = db.Column(db.String(100), nullable=True)
+    website = db.Column(db.String(200), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    avatar_url = db.Column(db.String(200), nullable=True)
 
     def __init__(self, username, email, is_approved=False, is_admin=False):
         self.username = username
@@ -30,8 +36,14 @@ class User(UserMixin, db.Model):
             'id': self.id,
             'username': self.username,
             'email': self.email,
+            'avatar_url': self.avatar_url,
             'is_approved': self.is_approved,
-            'is_admin': self.is_admin
+            'is_admin': self.is_admin,
+            'display_name': self.display_name,
+            'bio': self.bio,
+            'location': self.location,
+            'website': self.website,
+            'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
 class Post(db.Model):
@@ -42,7 +54,7 @@ class Post(db.Model):
     file_type = db.Column(db.String(20), nullable=True)
     video_url = db.Column(db.String(200), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def to_dict(self):
         return {
@@ -52,5 +64,10 @@ class Post(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'file_url': self.file_url,
             'file_type': self.file_type,
-            'video_url': self.video_url
+            'video_url': self.video_url,
+            'author': {
+                'id': self.author.id,
+                'username': self.author.username,
+                'display_name': self.author.display_name
+            }
         }

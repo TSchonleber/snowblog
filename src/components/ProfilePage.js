@@ -1,96 +1,117 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../api/axios';
+import axios from 'axios';
+import './ProfilePage.css';
 
 function ProfilePage() {
-  const { user, updateUser } = useAuth();
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [email, setEmail] = useState(user ? user.email : '');
-  const [username, setUsername] = useState(user ? user.username : '');
+  const { user } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState({});
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if (user) {
-      setEmail(user.email);
-      setUsername(user.username);
-    }
-  }, [user]);
+    fetchProfile();
+  }, []);
 
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
+  const fetchProfile = async () => {
     try {
-      const response = await api.post('/auth/change-password', { oldPassword, newPassword });
-      setMessage(response.data.message);
-      setOldPassword('');
-      setNewPassword('');
+      const response = await axios.get('/api/user/profile');
+      setProfile(response.data);
+      setEditedProfile(response.data);
     } catch (error) {
-      setMessage(error.response?.data?.error || 'An error occurred');
+      console.error('Error fetching profile:', error);
+      setMessage('Error fetching profile. Please try again.');
     }
   };
 
-  const handleUpdateProfile = async (e) => {
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditedProfile(profile);
+  };
+
+  const handleChange = (e) => {
+    setEditedProfile({ ...editedProfile, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.put('/auth/update-profile', { email, username });
-      updateUser(response.data.user);
+      await axios.put('/api/user/profile', editedProfile);
+      setProfile(editedProfile);
+      setIsEditing(false);
       setMessage('Profile updated successfully');
     } catch (error) {
-      setMessage(error.response?.data?.error || 'An error occurred');
+      console.error('Error updating profile:', error);
+      setMessage('Error updating profile. Please try again.');
     }
   };
 
-  if (!user) {
-    return <p>Please log in to view your profile.</p>;
-  }
+  if (!user) return <p>Please log in to view your profile.</p>;
+  if (!profile) return <div>Loading...</div>;
 
   return (
     <div className="profile-page">
-      <h2>Profile</h2>
-      <form onSubmit={handleUpdateProfile}>
+      <h2>Your Profile</h2>
+      {message && <div className="message">{message}</div>}
+      {isEditing ? (
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>Display Name:</label>
+            <input
+              type="text"
+              name="displayName"
+              value={editedProfile.displayName || ''}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label>Bio:</label>
+            <textarea
+              name="bio"
+              value={editedProfile.bio || ''}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label>Location:</label>
+            <input
+              type="text"
+              name="location"
+              value={editedProfile.location || ''}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label>Website:</label>
+            <input
+              type="url"
+              name="website"
+              value={editedProfile.website || ''}
+              onChange={handleChange}
+            />
+          </div>
+          <button type="submit">Save Changes</button>
+          <button type="button" onClick={handleCancel}>Cancel</button>
+        </form>
+      ) : (
         <div>
-          <label>Username:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
+          <p><strong>Username:</strong> {profile.username}</p>
+          <p><strong>Display Name:</strong> {profile.displayName || profile.username}</p>
+          <p><strong>Email:</strong> {profile.email}</p>
+          <p><strong>Bio:</strong> {profile.bio || 'No bio provided'}</p>
+          <p><strong>Location:</strong> {profile.location || 'Not specified'}</p>
+          <p><strong>Website:</strong> {profile.website ? <a href={profile.website} target="_blank" rel="noopener noreferrer">{profile.website}</a> : 'Not specified'}</p>
+          <button onClick={handleEdit}>Edit Profile</button>
         </div>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Update Profile</button>
-      </form>
-      <h3>Change Password</h3>
-      <form onSubmit={handleChangePassword}>
-        <div>
-          <label>Old Password:</label>
-          <input
-            type="password"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>New Password:</label>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Change Password</button>
-      </form>
-      {message && <p>{message}</p>}
+      )}
+      <div>
+        <p>View your public profile: <a href={`/profile/${profile.username}`}>Public Profile</a></p>
+      </div>
     </div>
   );
 }

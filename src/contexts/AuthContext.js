@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import api from '../api/axios';
 
 const AuthContext = createContext();
@@ -9,62 +9,52 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await api.get('/auth/check-auth');
-        console.log('Check auth response:', response.data); // Debugging line
-        if (response.data.authenticated) {
-          setUser({
-            username: response.data.user.username,
-            is_admin: response.data.user.is_admin
-          });
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.error('Auth check error:', error);
-        setUser(null);
-      }
-    };
-
-    checkAuth();
+    checkUserLoggedIn();
   }, []);
 
-  const login = async (username, password) => {
+  const checkUserLoggedIn = async () => {
     try {
-      const response = await api.post('/auth/login', { username, password });
-      console.log('Login response:', response.data); // Debugging line
-      setUser({
-        username: response.data.user.username,
-        is_admin: response.data.user.is_admin
-      });
-      return true;
+      const response = await api.get('/auth/check');
+      setUser(response.data.user);
     } catch (error) {
-      console.error('Login error:', error);
-      return false;
+      console.error('Error checking user login status:', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const login = async (userData) => {
+    setUser(userData);
+    return userData;
   };
 
   const logout = async () => {
     try {
-      await api.get('/auth/logout');
+      await api.post('/auth/logout');
       setUser(null);
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Logout failed:', error);
+      throw error;
     }
+  };
+
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
   };
 
   const value = {
     user,
     login,
-    logout
+    logout,
+    updateUser,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }

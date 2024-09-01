@@ -1,0 +1,218 @@
+.public-profile-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: var(--secondary-color);
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.profile-picture {
+  width: 150px;
+  height: 150px;
+  margin-right: 20px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.profile-picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-info h2 {
+  color: var(--primary-color);
+  margin: 0 0 10px 0;
+}
+
+.profile-info p {
+  margin-bottom: 10px;
+  color: var(--text-color);
+}
+
+.profile-info a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.profile-info a:hover {
+  text-decoration: underline;
+}
+
+.user-posts {
+  margin-top: 30px;
+}
+
+.user-posts h3 {
+  color: var(--primary-color);
+  margin-bottom: 15px;
+}
+
+.post-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.post-item {
+  background-color: rgba(0, 255, 255, 0.1);
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-title {
+  color: var(--text-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.post-title:hover {
+  color: var(--primary-color);
+}
+
+.post-date {
+  font-size: 0.8em;
+  color: var(--text-color);
+}
+
+.loading, .error {
+  text-align: center;
+  color: var(--primary-color);
+  font-size: 1.2em;
+  margin-top: 50px;
+}
+
+.avatar-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.avatar-preview {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+#avatar-upload {
+  display: none;
+}
+
+.avatar-upload-label {
+  padding: 10px 20px;
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.avatar-upload-label:hover {
+  background-color: var(--accent-color);
+}
+
+.edit-profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  color: var(--primary-color);
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--primary-color);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border-radius: 4px;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.save-button,
+.cancel-button,
+.edit-profile-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-button {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+}
+
+.cancel-button {
+  background-color: var(--accent-color);
+  color: var(--background-color);
+}
+
+.edit-profile-button {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  margin-top: 20px;
+}
+
+.save-button:hover,
+.cancel-button:hover,
+.edit-profile-button:hover {
+  opacity: 0.9;
+}
+
+.update-message {
+  background-color: rgba(0, 255, 255, 0.1);
+  color: var(--primary-color);
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.read-only-input {
+  background-color: rgba(0, 255, 255, 0.1);
+  color: var(--text-color);
+  cursor: not-allowed;
+}

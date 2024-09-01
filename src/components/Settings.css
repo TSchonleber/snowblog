@@ -1,0 +1,87 @@
+.settings-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: var(--secondary-color);
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.settings-page h2 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.settings-page form {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-page form > div {
+  margin-bottom: 15px;
+}
+
+.settings-page label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--primary-color);
+}
+
+.settings-page input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--primary-color);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border-radius: 4px;
+}
+
+.settings-page button {
+  padding: 10px 20px;
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.settings-page button:hover {
+  background-color: var(--accent-color);
+}
+
+.settings-page input[type="file"] {
+  border: none;
+  padding: 10px 0;
+}
+
+.current-avatar {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.current-avatar img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid var(--primary-color);
+}
+
+.message {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.message.success {
+  background-color: rgba(0, 255, 0, 0.1);
+  color: #00ff00;
+}
+
+.message.error {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #ff0000;
+}

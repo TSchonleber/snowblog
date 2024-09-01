@@ -1,19 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import Header from './components/Header';
 import Login from './components/Login';
 import SnowDump from './components/AIPage';
-import ProfilePage from './components/ProfilePage';
+import PublicProfilePage from './components/PublicProfilePage';
 import HomePage from './components/HomePage';
 import NewPostModal from './components/NewPostModal';
 import AboutMePopout from './components/AboutMePopout';
-import UserIcon from './components/UserIcon';
 import AdminPanel from './components/AdminPanel';
 import FloatingChat from './components/FloatingChat';
 import './App.css';
+import Settings from './components/Settings';
 
 function AppContent() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
   const [isAboutMeOpen, setIsAboutMeOpen] = useState(false);
   const [refreshPosts, setRefreshPosts] = useState(false);
@@ -22,7 +23,7 @@ function AppContent() {
 
   useEffect(() => {
     const handleMouseLeave = (e) => {
-      if (!aboutMeRef.current.contains(e.relatedTarget) && !aboutMeButtonRef.current.contains(e.relatedTarget)) {
+      if (!aboutMeRef.current?.contains(e.relatedTarget) && !aboutMeButtonRef.current?.contains(e.relatedTarget)) {
         setIsAboutMeOpen(false);
       }
     };
@@ -34,38 +35,29 @@ function AppContent() {
     };
   }, []);
 
-  console.log('Current user:', user);
-  console.log('Is admin:', user?.is_admin);
-
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>Snow-Blog</h1>
-        <nav>
-          <Link to="/">Home</Link>
-          {user ? (
-            <>
-              <Link to="/snow-dump">Snow-Dump</Link>
-              <button onClick={() => setIsNewPostModalOpen(true)}>New Post</button>
-              {user.is_admin && <Link to="/admin">Admin Panel</Link>}
-              <button onClick={logout}>Logout</button>
-              <UserIcon />
-            </>
-          ) : (
-            <Link to="/login">Login</Link>
-          )}
-        </nav>
-      </header>
+      <Header />
 
       <main className="App-main">
         <Routes>
-          <Route path="/" element={<HomePage refreshTrigger={refreshPosts} />} />
+          <Route path="/" element={<HomePage refreshTrigger={refreshPosts} setRefreshPosts={setRefreshPosts} />} />
           <Route path="/login" element={<Login />} />
           <Route path="/snow-dump" element={<SnowDump />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/profile/:username" element={<PublicProfilePage />} />
           <Route path="/admin" element={<AdminPanel />} />
         </Routes>
       </main>
+
+      {user && (
+        <button 
+          onClick={() => setIsNewPostModalOpen(true)} 
+          className="new-post-button"
+        >
+          + New Post
+        </button>
+      )}
 
       <NewPostModal 
         isOpen={isNewPostModalOpen} 
@@ -92,7 +84,7 @@ function AppContent() {
 
       <button 
         ref={aboutMeButtonRef}
-        className="about-me-button" 
+        className="about-me-button neon-text" 
         onMouseEnter={() => setIsAboutMeOpen(true)}
       >
         About Me

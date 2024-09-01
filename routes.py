@@ -251,26 +251,166 @@ def test_posts():
 @bp.route('/auth/login', methods=['POST'])
 def login():
     data = request.get_json()
-    print('Login attempt:', data.get('username'))
-    user = User.query.filter_by(username=data.get('username')).first()
-    if user and user.check_password(data.get('password')):
+    email = data.get('email')
+    password = data.get('password')
+
+    current_app.logger.info(f"Login attempt for email: {email}")
+    current_app.logger.debug(f"Received data: {data}")
+
+    if not email or not password:
+        current_app.logger.warning("Login failed: Email or password missing")
+        return jsonify({"message": "Email and password are required"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if user and user.check_password(password):
         login_user(user)
-        return jsonify({'message': 'Logged in successfully', 'user': user.to_dict()}), 200
-    return jsonify({'message': 'Invalid username or password'}), 401
+        current_app.logger.info(f"User {email} logged in successfully")
+        return jsonify({
+            "message": "Logged in successfully",
+            "user": user.to_dict()
+        }), 200
+    else:
+        current_app.logger.warning(f"Login failed for email: {email}")
+        return jsonify({"message": "Invalid email or password"}), 401
 
 @bp.route('/auth/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
-    return jsonify({'message': 'Logged out successfully'}), 200
+    return jsonify({"message": "Logged out successfully"}), 200
 
-@bp.route('/auth/check-auth', methods=['GET'])
+@bp.route('/auth/check', methods=['GET'])
 def check_auth():
     if current_user.is_authenticated:
-        return jsonify({'authenticated': True, 'user': current_user.to_dict()}), 200
-    return jsonify({'authenticated': False}), 200
+        return jsonify({
+            "authenticated": True,
+            "user": current_user.to_dict()
+        }), 200
+    else:
+        return jsonify({"authenticated": False}), 200
 
 @bp.route('/api/posts', methods=['GET'])
-def get_posts():  # Changed function name from api_posts to get_posts
+def get_posts():
     posts = Post.query.order_by(Post.created_at.desc()).all()
     return jsonify([post.to_dict() for post in posts])
+
+@bp.route('/api/user/profile', methods=['GET'])
+@login_required
+def get_user_profile():
+    return jsonify(current_user.to_dict()), 200
+
+@bp.route('/api/user/public-profile/<username>', methods=['GET'])
+def get_public_user_profile(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    public_profile = {
+        "username": user.username,
+        "display_name": user.display_name,
+        "bio": user.bio,
+        "location": user.location,
+        "website": user.website,
+        "created_at": user.created_at.isoformat() if user.created_at else None,
+        "avatar_url": user.avatar_url
+    }
+    return jsonify(public_profile), 200
+
+@bp.route('/api/posts/user/<username>', methods=['GET'])
+def get_user_posts(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).limit(10).all()
+    return jsonify([post.to_dict() for post in posts]), 200
+
+@bp.route('/api/user/settings', methods=['GET', 'PUT'])
+@login_required
+def user_settings():
+    if request.method == 'GET':
+        return jsonify(current_user.to_dict()), 200
+    elif request.method == 'PUT':
+        data = request.form
+        if 'email' in data:
+            current_user.email = data['email']
+        if 'password' in data:
+            current_user.set_password(data['password'])
+        
+        if 'avatar' in request.files:
+            file = request.files['avatar']
+            if file and file.filename:
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)
+                current_user.avatar_url = f'/uploads/{filename}'
+
+        db.session.commit()
+        return jsonify({'message': 'Settings updated successfully', 'user': current_user.to_dict()}), 200
+
+@bp.route('/api/user/public-profile/<username>', methods=['GET', 'PUT'])
+def public_user_profile(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    if request.method == 'GET':
+        public_profile = {
+            "username": user.username,
+            "display_name": user.display_name,
+            "bio": user.bio,
+            "location": user.location,
+            "website": user.website,
+            "created_at": user.created_at.isoformat() if user.created_at else None,
+            "avatar_url": user.avatar_url
+        }
+        return jsonify(public_profile), 200
+    elif request.method == 'PUT':
+        if current_user.is_authenticated and current_user.id == user.id:
+            data = request.form.to_dict()
+            user.display_name = data.get('display_name', user.display_name)
+            user.bio = data.get('bio', user.bio)
+            user.location = data.get('location', user.location)
+            user.website = data.get('website', user.website)
+            
+            if 'avatar' in request.files:
+                file = request.files['avatar']
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                    file.save(file_path)
+                    user.avatar_url = f'/uploads/{filename}'
+            
+            db.session.commit()
+            return jsonify(user.to_dict()), 200
+        else:
+            return jsonify({'error': 'Unauthorized'}), 403
+
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+@bp.record_once
+def on_load(state):
+    app = state.app
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@bp.route('/api/user/avatar', methods=['PUT'])
+@login_required
+def update_avatar():
+    if 'avatar' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['avatar']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+        current_user.avatar_url = f'/uploads/{filename}'
+        db.session.commit()
+        return jsonify({'message': 'Avatar updated successfully', 'avatar_url': current_user.avatar_url}), 200
+    return jsonify({'error': 'Invalid file type'}), 400

@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import api from '../api/axios';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import EditPostModal from './EditPostModal';
+import NewPostModal from './NewPostModal';
+import ExpandedPostModal from './ExpandedPostModal';
+import api from '../api/axios';
 import './HomePage.css';
 
-function HomePage({ refreshTrigger }) {
+function HomePage({ refreshTrigger, setRefreshPosts }) {
   const [posts, setPosts] = useState([]);
-  const [editingPost, setEditingPost] = useState(null);
+  const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
+  const [expandedPost, setExpandedPost] = useState(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -15,6 +18,7 @@ function HomePage({ refreshTrigger }) {
 
   const fetchPosts = async () => {
     try {
+      console.log('Fetching posts...');
       const response = await api.get('/api/posts');
       console.log('Fetched posts:', response.data);
       setPosts(response.data);
@@ -23,67 +27,55 @@ function HomePage({ refreshTrigger }) {
     }
   };
 
-  const handleDelete = async (postId) => {
-    if (window.confirm('Are you sure you want to delete this post?')) {
-      try {
-        await api.delete(`/api/posts/${postId}`);
-        fetchPosts();
-      } catch (error) {
-        console.error('Error deleting post:', error);
-      }
-    }
+  const openExpandedPost = (post) => {
+    setExpandedPost(post);
   };
 
-  const handleEdit = (post) => {
-    setEditingPost(post);
-  };
-
-  const handleEditComplete = () => {
-    setEditingPost(null);
-    fetchPosts();
+  const closeExpandedPost = () => {
+    setExpandedPost(null);
   };
 
   return (
     <div className="home-page">
       <h1 className="welcome-text">Welcome to Chaos</h1>
+      
+      {user && (
+        <button 
+          onClick={() => setIsNewPostModalOpen(true)} 
+          className="new-post-button"
+        >
+          + New Post
+        </button>
+      )}
+      
       <div className="posts-grid">
         {posts.length === 0 ? (
-          <p>No posts found.</p>
+          <p>No posts available.</p>
         ) : (
           posts.map(post => (
-            <div key={post.id} className="post-card">
+            <div key={post.id} className="post-card" onClick={() => openExpandedPost(post)}>
               <h2 className="post-title">{post.title}</h2>
-              <p className="post-content">{post.content}</p>
-              {post.file_url && (
-                <img src={post.file_url} alt="Post attachment" className="post-image" />
-              )}
-              {post.video_url && (
-                <iframe
-                  src={post.video_url}
-                  title="Embedded video"
-                  frameBorder="0"
-                  allowFullScreen
-                  className="post-video"
-                ></iframe>
-              )}
-              <p className="post-date">Posted on: {new Date(post.created_at).toLocaleDateString()}</p>
-              {user && (user.id === post.author_id || user.is_admin) && (
-                <div className="post-actions">
-                  <button onClick={() => handleEdit(post)} className="edit-button">Edit</button>
-                  <button onClick={() => handleDelete(post.id)} className="delete-button">Delete</button>
-                </div>
-              )}
+              <p className="post-content">{post.content.substring(0, 100)}...</p>
+              <p className="post-author">By: {post.author.display_name || post.author.username}</p>
+              <p className="post-date">{new Date(post.created_at).toLocaleDateString()}</p>
             </div>
           ))
         )}
       </div>
-      {editingPost && (
-        <EditPostModal
-          post={editingPost}
-          onClose={() => setEditingPost(null)}
-          onEditComplete={handleEditComplete}
-        />
-      )}
+
+      <NewPostModal 
+        isOpen={isNewPostModalOpen} 
+        onClose={() => setIsNewPostModalOpen(false)}
+        onPostCreated={() => {
+          setIsNewPostModalOpen(false);
+          setRefreshPosts(prev => !prev);
+        }}
+      />
+
+      <ExpandedPostModal 
+        post={expandedPost}
+        onClose={closeExpandedPost}
+      />
     </div>
   );
 }
