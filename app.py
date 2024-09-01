@@ -19,8 +19,12 @@ def create_app():
     app = Flask(__name__)
     CORS(app, supports_credentials=True)
     
+    # Print the database URL for debugging
+    db_url = os.getenv('DATABASE_URL')
+    print(f"Database URL: {db_url}")
+
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') or 'a-very-secret-key'
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SESSION_COOKIE_SECURE'] = True
     app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -51,22 +55,6 @@ def create_app():
     logging.basicConfig(level=logging.INFO)
     
     client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-    
-    @app.route('/api/ai/text', methods=['POST'])
-    def generate_text():
-        prompt = request.json['prompt']
-        try:
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=150
-            )
-            return jsonify({'text': response.choices[0].message.content.strip()})
-        except Exception as e:
-            return jsonify({'error': str(e)}), 500
     
     return app
 

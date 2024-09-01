@@ -11,15 +11,21 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Check authentication status when the app loads
     const checkAuth = async () => {
       try {
         const response = await api.get('/auth/check-auth');
+        console.log('Check auth response:', response.data); // Debugging line
         if (response.data.authenticated) {
-          setUser(response.data.user);
+          setUser({
+            username: response.data.user.username,
+            is_admin: response.data.user.is_admin
+          });
+        } else {
+          setUser(null);
         }
       } catch (error) {
         console.error('Auth check error:', error);
+        setUser(null);
       }
     };
 
@@ -29,10 +35,12 @@ export function AuthProvider({ children }) {
   const login = async (username, password) => {
     try {
       const response = await api.post('/auth/login', { username, password });
-      if (response.data.message === "Logged in successfully") {
-        setUser(response.data.user);
-        return true;
-      }
+      console.log('Login response:', response.data); // Debugging line
+      setUser({
+        username: response.data.user.username,
+        is_admin: response.data.user.is_admin
+      });
+      return true;
     } catch (error) {
       console.error('Login error:', error);
       return false;
@@ -48,8 +56,14 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const value = {
+    user,
+    login,
+    logout
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

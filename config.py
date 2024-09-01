@@ -2,6 +2,9 @@ import os
 import sys
 import logging
 from urllib.parse import quote_plus
+from dotenv import load_dotenv
+
+load_dotenv()
 
 print(f"Current working directory: {os.getcwd()}")
 

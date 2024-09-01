@@ -12,6 +12,7 @@ from ai_utils import generate_image, text_chat
 from openai import OpenAI
 from io import BytesIO
 import base64
+import traceback  # Add this import
 
 bp = Blueprint('main', __name__)
 
@@ -24,6 +25,13 @@ def extract_youtube_id(url):
     return match.group('id') if match else None
 
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+class AIModel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    type = db.Column(db.String(20), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+    api_type = db.Column(db.String(20), nullable=False)  # 'openai', 'fal', 'claude', 'gemini', etc.
 
 @bp.route('/')
 def home():
@@ -154,38 +162,66 @@ def api_post(post_id):
         db.session.commit()
         return '', 204
 
+@bp.route('/api/ai-models', methods=['GET'])
+@login_required
+def get_ai_models():
+    models = AIModel.query.all()
+    return jsonify([{'id': m.id, 'name': m.name, 'type': m.type, 'isActive': m.is_active, 'apiType': m.api_type} for m in models])
+
+@bp.route('/api/ai-models', methods=['POST'])
+@login_required
+def add_ai_model():
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+    data = request.json
+    new_model = AIModel(name=data['name'], type=data['type'], is_active=data.get('isActive', True), api_type=data['apiType'])
+    db.session.add(new_model)
+    db.session.commit()
+    return jsonify({'id': new_model.id, 'name': new_model.name, 'type': new_model.type, 'isActive': new_model.is_active, 'apiType': new_model.api_type}), 201
+
 @bp.route('/api/ai/text', methods=['POST'])
 @login_required
 def ai_text_response():
     data = request.get_json()
     message = data.get('message')
-    history = data.get('history', [])
-    model = data.get('model', 'gpt-3.5-turbo')
+    model_name = data.get('model')
+    
+    logging.info(f"Received text generation request. Message: {message}, Model: {model_name}")
 
     if not message:
+        logging.error("No message provided in request")
         return jsonify({"error": "No message provided"}), 400
 
     try:
-        updated_history = text_chat(message, history, model)
-        return jsonify({"history": updated_history})
+        response = text_chat(message, [], model_name)
+        logging.info(f"Text generation successful. Response: {response[-1][1]}")
+        return jsonify({"response": response[-1][1]})
     except Exception as e:
         logging.error(f"AI API error: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        logging.error(f"Traceback: {traceback.format_exc()}")
+        return jsonify({"error": f"Failed to generate text: {str(e)}"}), 500
 
 @bp.route('/api/ai/image', methods=['POST'])
 @login_required
 def ai_image_response():
-    data = request.get_json()
-    prompt = data.get('prompt')
-    model = data.get('model', 'flux-dev')
+    prompt = request.form.get('prompt', '')
+    model = request.form.get('model', 'flux-dev')
     
     logging.info(f"Received request for model: {model}, prompt: {prompt}")
     
-    if not prompt:
-        return jsonify({"error": "No prompt provided"}), 400
+    uploaded_images = []
+    for key, file in request.files.items():
+        if key.startswith('image') and file.filename != '':
+            filename = secure_filename(file.filename)
+            upload_folder = os.path.join(current_app.root_path, 'uploads')
+            if not os.path.exists(upload_folder):
+                os.makedirs(upload_folder)
+            file_path = os.path.join(upload_folder, filename)
+            file.save(file_path)
+            uploaded_images.append(file_path)
 
     try:
-        image_data = generate_image(prompt, model)
+        image_data = generate_image(prompt, model, uploaded_images)
         if image_data:
             # Convert PIL Image to base64 string
             buffered = BytesIO()
@@ -195,6 +231,15 @@ def ai_image_response():
         else:
             logging.error("Failed to generate image: No image data returned")
             return jsonify({"error": "Failed to generate image: No image data returned"}), 500
+    except ValueError as e:
+        logging.error(f"ValueError in image generation: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+    except TimeoutError as e:
+        logging.error(f"TimeoutError in image generation: {str(e)}")
+        return jsonify({"error": str(e)}), 504  # Gateway Timeout
+    except ConnectionError as e:
+        logging.error(f"ConnectionError in image generation: {str(e)}")
+        return jsonify({"error": str(e)}), 503  # Service Unavailable
     except Exception as e:
         logging.error(f"AI API error: {str(e)}")
         return jsonify({"error": f"Failed to generate image: {str(e)}"}), 500

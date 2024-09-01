@@ -1,38 +1,39 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api/axios';
+import ImageUploader from './ImageUploader';
+import './AIPage.css';
 
-function SnowAI() { 
+function SnowDump() { 
   const { user } = useAuth();
-  const [textInput, setTextInput] = useState('');
   const [imageInput, setImageInput] = useState('');
   const [selectedModel, setSelectedModel] = useState('flux-dev');
-  const [textOutput, setTextOutput] = useState('');
   const [imageOutput, setImageOutput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleTextSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const response = await api.post('/api/ai/text', { prompt: textInput });
-      setTextOutput(response.data.response);
-    } catch (error) {
-      console.error('Error:', error);
-      setTextOutput('An error occurred while processing your text request.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [error, setError] = useState('');
 
   const handleImageSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setImageOutput('');
+    setError('');
+    
+    const formData = new FormData();
+    if (imageInput.trim()) {
+      formData.append('prompt', imageInput);
+    }
+    formData.append('model', selectedModel);
+    uploadedImages.forEach((image, index) => {
+      formData.append(`image${index}`, image);
+    });
+
     try {
-      const response = await api.post('/api/ai/image', { 
-        prompt: imageInput,
-        model: selectedModel
+      if (!imageInput.trim() && uploadedImages.length === 0) {
+        throw new Error('Please provide a prompt or upload an image');
+      }
+      const response = await api.post('/api/ai/image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (response.data.image_data) {
         setImageOutput(response.data.image_data);
@@ -41,73 +42,58 @@ function SnowAI() {
       }
     } catch (error) {
       console.error('Error:', error);
-      setImageOutput('An error occurred while processing your image request.');
+      setError(error.message || 'An error occurred while processing your image request.');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleImagesSelected = (images) => {
+    setUploadedImages(images);
+  };
+
   if (!user) {
-    return <p>Please log in to use the AI assistant.</p>;
+    return <p>Please log in to use the Snow-Dump feature.</p>;
   }
 
   return (
-    <div className="ai-page">
-      <h2>Snow-AI Assistant</h2>
-      <div className="ai-section">
-        <h3>Text Generation</h3>
-        <form onSubmit={handleTextSubmit}>
-          <textarea
-            value={textInput}
-            onChange={(e) => setTextInput(e.target.value)}
-            placeholder="Enter your text prompt here"
-          />
-          <button type="submit" disabled={isLoading}>
-            {isLoading ? 'Processing...' : 'Generate Text'}
-          </button>
-        </form>
-        {textOutput && (
-          <div className="ai-output">
-            <h4>Generated Text:</h4>
-            <p>{textOutput}</p>
-          </div>
-        )}
-      </div>
-      <div className="ai-section">
-        <h3>Image Generation</h3>
-        <form onSubmit={handleImageSubmit}>
-          <textarea
-            value={imageInput}
-            onChange={(e) => setImageInput(e.target.value)}
-            placeholder="Enter your image prompt here"
-          />
+    <div className="snow-dump">
+      <h2>Snow-Dump</h2>
+      <div className="snow-dump-container">
+        <div className="input-panel">
           <select
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
+            className="model-select"
           >
             <option value="flux-dev">Flux Dev</option>
             <option value="fal-flux-schnell">Flux Schnell</option>
             <option value="fal-sd-v3-medium">Stable Diffusion v3</option>
             <option value="fal-flux-realism">Flux Realism</option>
             <option value="fal-ai/flux-lora">Flux LoRA</option>
+            <option value="fal-ai/flux/dev/image-to-image">Image to Image</option>
           </select>
-          <button type="submit" disabled={isLoading}>
-            {isLoading ? 'Processing...' : 'Generate Image'}
+          <ImageUploader onImagesSelected={handleImagesSelected} />
+          <textarea
+            value={imageInput}
+            onChange={(e) => setImageInput(e.target.value)}
+            placeholder="Describe the image you want to generate..."
+            className="prompt-input"
+          />
+          <button onClick={handleImageSubmit} disabled={isLoading} className="generate-button">
+            {isLoading ? 'Generating...' : 'Generate Image'}
           </button>
-        </form>
-        {imageOutput && (
-          <div className="ai-output">
-            <h4>Generated Image:</h4>
-            {typeof imageOutput === 'string' && imageOutput.startsWith('data:image/') ? (
-              <img src={imageOutput} alt="AI Generated" className="ai-image" />
-            ) : (
-              <p>{imageOutput}</p>
-            )}
-          </div>
-        )}
+        </div>
+        <div className="output-panel">
+          {isLoading && <div className="loading">Generating image...</div>}
+          {error && <div className="error">{error}</div>}
+          {imageOutput && (
+            <img src={imageOutput} alt="AI Generated" className="generated-image" />
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-export default SnowAI;
+export default SnowDump;

@@ -10,12 +10,29 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256))  # Increase this to 256
     reset_token = db.Column(db.String(100), unique=True, nullable=True)
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+    is_approved = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
+    def __init__(self, username, email, is_approved=False, is_admin=False):
+        self.username = username
+        self.email = email
+        self.is_approved = is_approved
+        self.is_admin = is_admin
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'is_approved': self.is_approved,
+            'is_admin': self.is_admin
+        }
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
