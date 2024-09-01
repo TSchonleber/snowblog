@@ -20,11 +20,18 @@ def create_app():
     CORS(app, supports_credentials=True)
     
     # Print the database URL for debugging
-    db_url = os.getenv('DATABASE_URL')
-    print(f"Database URL: {db_url}")
+    db_user = os.getenv('DB_USER')
+    db_pass = os.getenv('DB_PASS')
+    db_name = os.getenv('DB_NAME')
+    db_host = os.getenv('DB_HOST')
+    db_port = os.getenv('DB_PORT')
+
+    # Construct DATABASE_URL from individual components
+    DATABASE_URL = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
+    print("Constructed DATABASE_URL:", DATABASE_URL)
 
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') or 'a-very-secret-key'
-    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SESSION_COOKIE_SECURE'] = True
     app.config['SESSION_COOKIE_HTTPONLY'] = True
