@@ -1,0 +1,14 @@
+.about-me {
+  color: #e0e0e0;
+  font-family: 'Roboto Mono', monospace;
+  line-height: 1.6;
+}
+
+.about-me h3 {
+  color: #00ffff;
+  margin-bottom: 1rem;
+}
+
+.about-me p {
+  margin-bottom: 1rem;
+}

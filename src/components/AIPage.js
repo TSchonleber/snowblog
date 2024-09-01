@@ -57,14 +57,14 @@ function SnowDump() {
   }
 
   return (
-    <div className="snow-dump">
-      <h2>Snow-Dump</h2>
+    <div className="snow-dump" style={{ width: '100%' }}>
+      <h2 className="glitch" data-text="Snow-Dump">Snow-Dump</h2>
       <div className="snow-dump-container">
         <div className="input-panel">
           <select
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
-            className="model-select"
+            className="model-select neon-border"
           >
             <option value="flux-dev">Flux Dev</option>
             <option value="fal-flux-schnell">Flux Schnell</option>
@@ -78,9 +78,9 @@ function SnowDump() {
             value={imageInput}
             onChange={(e) => setImageInput(e.target.value)}
             placeholder="Describe the image you want to generate..."
-            className="prompt-input"
+            className="prompt-input neon-border"
           />
-          <button onClick={handleImageSubmit} disabled={isLoading} className="generate-button">
+          <button onClick={handleImageSubmit} disabled={isLoading} className="generate-button neon-border">
             {isLoading ? 'Generating...' : 'Generate Image'}
           </button>
         </div>
@@ -88,7 +88,7 @@ function SnowDump() {
           {isLoading && <div className="loading">Generating image...</div>}
           {error && <div className="error">{error}</div>}
           {imageOutput && (
-            <img src={imageOutput} alt="AI Generated" className="generated-image" />
+            <img src={imageOutput} alt="AI Generated" className="generated-image neon-border" />
           )}
         </div>
       </div>

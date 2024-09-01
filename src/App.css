@@ -1,19 +1,24 @@
 :root {
   --background-color: #0a0e17;
-  --primary-color: #00ff9d;
-  --secondary-color: #0d1117;
+  --primary-color: #00ffff;
+  --secondary-color: #00ff00;
   --text-color: #e0e0e0;
-  --accent-color: #ff00ff;
+  --accent-color: #0077ff;
   --header-color: #1a1e26;
 }
 
 body {
   background-color: var(--background-color);
   color: var(--text-color);
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Orbitron', 'Roboto Mono', monospace;
   margin: 0;
   padding: 0;
   line-height: 1.6;
+  background-image: linear-gradient(rgba(10, 14, 23, 0.8), rgba(10, 14, 23, 0.8)),
+                    url('./TsKBtJ03iGxJqs5VV-Q8f_d5d71f2b2b704cbcb58383d9b80a2d14.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 .App {
@@ -23,16 +28,17 @@ body {
 }
 
 .App-header {
-  background-color: var(--header-color);
+  background-color: rgba(26, 30, 38, 0.8);
   padding: 1rem 2rem;
   color: var(--primary-color);
-  box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
 }
 
 .App-header h1 {
   margin: 0;
-  font-size: 2rem;
-  text-shadow: 0 0 5px var(--primary-color);
+  font-size: 2.5rem;
+  text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
+  letter-spacing: 2px;
 }
 
 .App-header nav {
@@ -50,12 +56,15 @@ body {
   border-radius: 4px;
   transition: all 0.3s ease;
   border: 1px solid transparent;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .App-header a:hover, .App-header button:hover {
-  background-color: rgba(0, 255, 157, 0.1);
+  background-color: rgba(0, 255, 255, 0.2);
   border-color: var(--primary-color);
-  box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  text-shadow: 0 0 5px var(--primary-color);
 }
 
 .App-main {
@@ -648,3 +657,62 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0, 255, 157, 0.5);
 }
+
+/* Add these new styles for enhanced cyberpunk look */
+
+.neon-text {
+  color: var(--primary-color);
+  text-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color), 0 0 15px var(--primary-color);
+}
+
+.neon-border {
+  border: 1px solid var(--primary-color);
+  box-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color), 0 0 15px var(--primary-color);
+}
+
+.glitch-effect {
+  position: relative;
+  color: var(--primary-color);
+}
+
+.glitch-effect::before,
+.glitch-effect::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch-effect::before {
+  left: 2px;
+  text-shadow: -2px 0 var(--secondary-color);
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch-effect::after {
+  left: -2px;
+  text-shadow: -2px 0 var(--primary-color);
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+  0% {
+    clip: rect(31px, 9999px, 94px, 0);
+  }
+  5% {
+    clip: rect(70px, 9999px, 71px, 0);
+  }
+  10% {
+    clip: rect(29px, 9999px, 83px, 0);
+  }
+  /* ... add more keyframes as desired */
+  100% {
+    clip: rect(67px, 9999px, 62px, 0);
+  }
+}
+
+/* Add more cyberpunk-inspired styles as needed */

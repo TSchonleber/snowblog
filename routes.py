@@ -77,16 +77,16 @@ def delete_post(post_id):
     return redirect(url_for('main.home'))
 
 @bp.route('/api/posts', methods=['GET', 'POST'])
-@login_required
 def api_posts():
     if request.method == 'GET':
         posts = Post.query.order_by(Post.created_at.desc()).all()
+        print(f"Fetched {len(posts)} posts")
         return jsonify([post.to_dict() for post in posts])
-    
-    elif request.method == 'POST':
-        logging.debug(f"Received POST request: {request.form}")
-        logging.debug(f"Files in request: {request.files}")
 
+    if request.method == 'POST':
+        if not current_user.is_authenticated:
+            return jsonify({"error": "You must be logged in to create a post"}), 401
+        
         title = request.form.get('title')
         content = request.form.get('content', '')
         video_url = request.form.get('videoUrl')
@@ -106,7 +106,10 @@ def api_posts():
 
         if file and file.filename:
             filename = secure_filename(file.filename)
-            file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            upload_folder = current_app.config['UPLOAD_FOLDER']
+            if not os.path.exists(upload_folder):
+                os.makedirs(upload_folder)
+            file_path = os.path.join(upload_folder, filename)
             file.save(file_path)
             new_post.file_url = f'/uploads/{filename}'
             new_post.file_type = file.content_type.split('/')[0]
@@ -126,41 +129,34 @@ def api_posts():
 def uploaded_file(filename):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
 
-@bp.route('/api/posts/<int:post_id>', methods=['GET', 'PUT', 'DELETE'])
-def api_post(post_id):
+@bp.route('/api/posts/<int:post_id>', methods=['DELETE', 'PUT'])
+@login_required
+def manage_post(post_id):
     post = Post.query.get_or_404(post_id)
+    if post.author != current_user and not current_user.is_admin:
+        return jsonify({"error": "Unauthorized"}), 403
 
-    if request.method == 'GET':
-        return jsonify({
-            'id': post.id,
-            'title': post.title,
-            'content': post.content,
-            'file_url': post.file_url,
-            'file_type': post.file_type,
-            'video_url': post.video_url,
-            'created_at': post.created_at.isoformat()
-        })
-
-    elif request.method == 'PUT':
-        data = request.json
-        post.title = data.get('title', post.title)
-        post.content = data.get('content', post.content)
-        post.video_url = data.get('videoUrl', post.video_url)
-        db.session.commit()
-        return jsonify({
-            'id': post.id,
-            'title': post.title,
-            'content': post.content,
-            'file_url': post.file_url,
-            'file_type': post.file_type,
-            'video_url': post.video_url,
-            'created_at': post.created_at.isoformat()
-        })
-
-    elif request.method == 'DELETE':
+    if request.method == 'DELETE':
         db.session.delete(post)
         db.session.commit()
-        return '', 204
+        return jsonify({"message": "Post deleted successfully"}), 200
+
+    if request.method == 'PUT':
+        data = request.form
+        post.title = data.get('title', post.title)
+        post.content = data.get('content', post.content)
+        
+        if 'file' in request.files:
+            file = request.files['file']
+            if file and file.filename:
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)
+                post.file_url = f'/uploads/{filename}'
+                post.file_type = file.content_type.split('/')[0]
+        
+        db.session.commit()
+        return jsonify(post.to_dict()), 200
 
 @bp.route('/api/ai-models', methods=['GET'])
 @login_required
@@ -243,3 +239,11 @@ def ai_image_response():
     except Exception as e:
         logging.error(f"AI API error: {str(e)}")
         return jsonify({"error": f"Failed to generate image: {str(e)}"}), 500
+
+@bp.route('/api/test_posts', methods=['GET'])
+def test_posts():
+    posts = Post.query.all()
+    return jsonify({
+        'count': len(posts),
+        'posts': [{'id': post.id, 'title': post.title} for post in posts]
+    })

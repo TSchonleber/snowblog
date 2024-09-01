@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import './Login.css';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -13,41 +14,41 @@ function Login() {
     e.preventDefault();
     setError('');
     try {
-      const success = await login(username, password);
-      if (success) {
-        navigate('/');
-      } else {
-        setError('Failed to log in');
-      }
+      await login(username, password);
+      navigate('/');
     } catch (error) {
-      setError('An error occurred during login');
+      setError('Failed to log in. Please check your credentials.');
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      {error && <p>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Username:</label>
+    <div className="login-container">
+      <form onSubmit={handleSubmit} className="login-form">
+        <h2 className="login-title">Login</h2>
+        {error && <p className="error-message">{error}</p>}
+        <div className="input-group">
+          <label htmlFor="username">Username</label>
           <input
             type="text"
+            id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            className="login-input"
           />
         </div>
-        <div>
-          <label>Password:</label>
+        <div className="input-group">
+          <label htmlFor="password">Password</label>
           <input
             type="password"
+            id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="login-input"
           />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit" className="login-button">Log In</button>
       </form>
     </div>
   );

@@ -16,6 +16,7 @@ function AppContent() {
   const { user, logout } = useAuth();
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
   const [isAboutMeOpen, setIsAboutMeOpen] = useState(false);
+  const [refreshPosts, setRefreshPosts] = useState(false);
   const aboutMeRef = useRef(null);
   const aboutMeButtonRef = useRef(null);
 
@@ -58,7 +59,7 @@ function AppContent() {
 
       <main className="App-main">
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomePage refreshTrigger={refreshPosts} />} />
           <Route path="/login" element={<Login />} />
           <Route path="/snow-dump" element={<SnowDump />} />
           <Route path="/profile" element={<ProfilePage />} />
@@ -71,6 +72,7 @@ function AppContent() {
         onClose={() => setIsNewPostModalOpen(false)}
         onPostCreated={() => {
           setIsNewPostModalOpen(false);
+          setRefreshPosts(prev => !prev);
         }}
       />
 

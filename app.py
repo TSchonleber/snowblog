@@ -31,6 +31,12 @@ def create_app():
     app.config['SESSION_COOKIE_SAMESITE'] = 'None'
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
+    # Set the UPLOAD_FOLDER configuration
+    app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'uploads')
+
+    # Ensure the upload folder exists
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
     from extensions import db
     db.init_app(app)
     migrate = Migrate(app, db)

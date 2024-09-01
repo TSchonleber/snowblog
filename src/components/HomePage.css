@@ -1,0 +1,156 @@
+.home-page {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.welcome-text {
+  font-size: 3em;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+  animation: glitch 1s linear infinite;
+}
+
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.post-card {
+  background-color: rgba(10, 14, 23, 0.8);
+  border: 1px solid #00ffff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 255, 255, 0.5);
+}
+
+.post-title {
+  color: #00ffff;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.post-content {
+  color: #e0e0e0;
+  margin-bottom: 15px;
+}
+
+.post-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.post-video {
+  width: 100%;
+  height: 200px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.post-date {
+  font-size: 0.8em;
+  color: #888;
+  text-align: right;
+}
+
+@keyframes glitch {
+  2%, 64% {
+    transform: translate(2px,0) skew(0deg);
+  }
+  4%, 60% {
+    transform: translate(-2px,0) skew(0deg);
+  }
+  62% {
+    transform: translate(0,0) skew(5deg); 
+  }
+}
+
+.welcome-text:before,
+.welcome-text:after {
+  content: 'Welcome to Chaos';
+  position: absolute;
+  left: 0;
+}
+
+.welcome-text:before {
+  animation: glitchTop 1s linear infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+  -webkit-clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+}
+
+@keyframes glitchTop {
+  2%, 64% {
+    transform: translate(2px,-2px);
+  }
+  4%, 60% {
+    transform: translate(-2px,2px);
+  }
+  62% {
+    transform: translate(13px,-1px) skew(-13deg); 
+  }
+}
+
+.welcome-text:after {
+  animation: glitchBotom 1.5s linear infinite;
+  clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+  -webkit-clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+}
+
+@keyframes glitchBotom {
+  2%, 64% {
+    transform: translate(-2px,0);
+  }
+  4%, 60% {
+    transform: translate(-2px,0);
+  }
+  62% {
+    transform: translate(-22px,5px) skew(21deg); 
+  }
+}
+
+@media (max-width: 768px) {
+  .posts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.post-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.edit-button, .delete-button {
+  padding: 5px 10px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.edit-button {
+  background-color: #00ffff;
+  color: #000;
+}
+
+.delete-button {
+  background-color: #ff00ff;
+  color: #000;
+}
+
+.edit-button:hover, .delete-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 255, 255, 0.5);
+}
