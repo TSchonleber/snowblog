@@ -1,0 +1,54 @@
+.profile-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: rgba(10, 14, 23, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.profile-page h2, .profile-page h3 {
+  color: #00ffff;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  color: #00ffff;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 1px solid #00ffff;
+  color: #00ffff;
+  border-radius: 5px;
+}
+
+.profile-page button {
+  background-color: #00ffff;
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-page button:hover {
+  background-color: #00cccc;
+}
+
+.message {
+  background-color: rgba(0, 255, 255, 0.1);
+  color: #00ffff;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}

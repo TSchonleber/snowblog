@@ -1,5 +1,4 @@
 import os
-import logging
 from flask import Flask, session, request, jsonify
 from flask_cors import CORS
 from flask_login import LoginManager
@@ -10,6 +9,7 @@ from datetime import timedelta
 from sqlalchemy.orm import Session
 from openai import OpenAI
 from flask_migrate import Migrate
+import logging
 
 load_dotenv()
 
@@ -46,7 +46,8 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(user_id):
-        return db.session.get(User, int(user_id))
+        from models import User  # Import here to avoid circular imports
+        return User.query.get(int(user_id))
 
     @app.before_request
     def make_session_permanent():

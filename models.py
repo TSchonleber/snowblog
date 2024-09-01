@@ -7,7 +7,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
-    password_hash = db.Column(db.String(256))  # Increase this to 256
+    password_hash = db.Column(db.String(128))  # Increased to 128
     reset_token = db.Column(db.String(100), unique=True, nullable=True)
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     is_approved = db.Column(db.Boolean, default=False)
@@ -49,8 +49,8 @@ class Post(db.Model):
             'id': self.id,
             'title': self.title,
             'content': self.content,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
             'file_url': self.file_url,
             'file_type': self.file_type,
-            'video_url': self.video_url,
-            'created_at': self.created_at.isoformat()
+            'video_url': self.video_url
         }

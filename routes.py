@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app, send_from_directory
 from extensions import db
-from models import Post
+from models import Post, User
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
 import logging
 import re
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, login_user, logout_user
 import openai
 from ai_utils import generate_image, text_chat
 from openai import OpenAI
@@ -247,3 +247,30 @@ def test_posts():
         'count': len(posts),
         'posts': [{'id': post.id, 'title': post.title} for post in posts]
     })
+
+@bp.route('/auth/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    print('Login attempt:', data.get('username'))
+    user = User.query.filter_by(username=data.get('username')).first()
+    if user and user.check_password(data.get('password')):
+        login_user(user)
+        return jsonify({'message': 'Logged in successfully', 'user': user.to_dict()}), 200
+    return jsonify({'message': 'Invalid username or password'}), 401
+
+@bp.route('/auth/logout', methods=['POST'])
+@login_required
+def logout():
+    logout_user()
+    return jsonify({'message': 'Logged out successfully'}), 200
+
+@bp.route('/auth/check-auth', methods=['GET'])
+def check_auth():
+    if current_user.is_authenticated:
+        return jsonify({'authenticated': True, 'user': current_user.to_dict()}), 200
+    return jsonify({'authenticated': False}), 200
+
+@bp.route('/api/posts', methods=['GET'])
+def get_posts():  # Changed function name from api_posts to get_posts
+    posts = Post.query.order_by(Post.created_at.desc()).all()
+    return jsonify([post.to_dict() for post in posts])

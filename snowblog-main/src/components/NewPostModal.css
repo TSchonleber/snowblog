@@ -1,0 +1,206 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.cyberpunk-modal {
+  background-color: rgba(10, 14, 23, 0.9);
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  border: 2px solid #00ffff;
+}
+
+.modal-title {
+  color: #00ffff;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  text-transform: uppercase;
+}
+
+.cyberpunk-input, .cyberpunk-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 1px solid #00ffff;
+  color: #00ffff;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.cyberpunk-input:focus, .cyberpunk-textarea:focus {
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.cyberpunk-textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.cyberpunk-file-input {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: rgba(0, 255, 255, 0.1);
+  color: #00ffff;
+  border: 1px solid #00ffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.cyberpunk-file-input:hover {
+  background-color: rgba(0, 255, 255, 0.2);
+}
+
+.cyberpunk-file-input input[type="file"] {
+  display: none;
+}
+
+.file-name {
+  color: #00ffff;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.cyberpunk-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  color: #000;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-button {
+  background-color: #00ffff;
+}
+
+.cancel-button {
+  background-color: #ff00ff;
+}
+
+.cyberpunk-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+}
+
+.glitch {
+  position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch::before {
+  left: 2px;
+  text-shadow: -2px 0 #ff00ff;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+  left: -2px;
+  text-shadow: -2px 0 #00ffff;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+  0% {
+    clip: rect(31px, 9999px, 94px, 0);
+  }
+  5% {
+    clip: rect(70px, 9999px, 71px, 0);
+  }
+  10% {
+    clip: rect(29px, 9999px, 83px, 0);
+  }
+  15% {
+    clip: rect(28px, 9999px, 70px, 0);
+  }
+  20% {
+    clip: rect(94px, 9999px, 85px, 0);
+  }
+  25% {
+    clip: rect(52px, 9999px, 27px, 0);
+  }
+  30% {
+    clip: rect(75px, 9999px, 61px, 0);
+  }
+  35% {
+    clip: rect(82px, 9999px, 98px, 0);
+  }
+  40% {
+    clip: rect(21px, 9999px, 75px, 0);
+  }
+  45% {
+    clip: rect(37px, 9999px, 62px, 0);
+  }
+  50% {
+    clip: rect(71px, 9999px, 37px, 0);
+  }
+  55% {
+    clip: rect(90px, 9999px, 93px, 0);
+  }
+  60% {
+    clip: rect(6px, 9999px, 76px, 0);
+  }
+  65% {
+    clip: rect(54px, 9999px, 64px, 0);
+  }
+  70% {
+    clip: rect(30px, 9999px, 57px, 0);
+  }
+  75% {
+    clip: rect(76px, 9999px, 85px, 0);
+  }
+  80% {
+    clip: rect(15px, 9999px, 34px, 0);
+  }
+  85% {
+    clip: rect(46px, 9999px, 54px, 0);
+  }
+  90% {
+    clip: rect(56px, 9999px, 71px, 0);
+  }
+  95% {
+    clip: rect(5px, 9999px, 59px, 0);
+  }
+  100% {
+    clip: rect(67px, 9999px, 62px, 0);
+  }
+}
