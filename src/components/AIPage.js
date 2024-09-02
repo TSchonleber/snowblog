@@ -1,94 +1,163 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import api from '../api/axios';
-import ImageUploader from './ImageUploader';
+import axios from 'axios';
 import './AIPage.css';
 
-function SnowDump() { 
-  const { user } = useAuth();
-  const [imageInput, setImageInput] = useState('');
+function AIPage() {
+  const [prompt, setPrompt] = useState('');
+  const [generatedImage, setGeneratedImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [selectedModel, setSelectedModel] = useState('flux-dev');
-  const [imageOutput, setImageOutput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [uploadedImages, setUploadedImages] = useState([]);
-  const [error, setError] = useState('');
+  const [imageSize, setImageSize] = useState('landscape_16_9');
+  const [inferenceSteps, setInferenceSteps] = useState(50);
+  const [guidanceScale, setGuidanceScale] = useState(7.5);
+  const [nsfwAllowed, setNsfwAllowed] = useState(false);
+  const [nsfwDetected, setNsfwDetected] = useState(false);
 
-  const handleImageSubmit = async (e) => {
+  const models = [
+    { value: 'flux-dev', label: 'Flux Dev' },
+    { value: 'flux-schnell', label: 'Flux Schnell' },
+    { value: 'sd-v3-medium', label: 'Stable Diffusion v3 Medium' },
+    { value: 'flux-realism', label: 'Flux Realism' },
+    { value: 'flux-lora', label: 'Flux LoRA' }
+  ];
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setImageOutput('');
-    setError('');
-    
-    const formData = new FormData();
-    if (imageInput.trim()) {
-      formData.append('prompt', imageInput);
-    }
-    formData.append('model', selectedModel);
-    uploadedImages.forEach((image, index) => {
-      formData.append(`image${index}`, image);
-    });
+    setLoading(true);
+    setError(null);
+    setGeneratedImage(null);
+    setNsfwDetected(false);
 
     try {
-      if (!imageInput.trim() && uploadedImages.length === 0) {
-        throw new Error('Please provide a prompt or upload an image');
-      }
-      const response = await api.post('/api/ai/image', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      const response = await axios.post('/api/generate-image', {
+        prompt,
+        model: selectedModel,
+        image_size: imageSize,
+        inference_steps: inferenceSteps,
+        guidance_scale: guidanceScale,
+        nsfw_allowed: nsfwAllowed
       });
-      if (response.data.image_data) {
-        setImageOutput(response.data.image_data);
-      } else {
-        throw new Error('No image data received');
-      }
+      setGeneratedImage(response.data.image_url);
+      setNsfwDetected(response.data.nsfw_detected);
+      
+      console.log("Full API response:", response.data);
     } catch (error) {
-      console.error('Error:', error);
-      setError(error.message || 'An error occurred while processing your image request.');
+      console.error("Error details:", error.response?.data);
+      setError(error.response?.data?.error || 'An error occurred');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleImagesSelected = (images) => {
-    setUploadedImages(images);
-  };
-
-  if (!user) {
-    return <p>Please log in to use the Snow-Dump feature.</p>;
-  }
-
   return (
-    <div className="snow-dump" style={{ width: '100%' }}>
-      <h2 className="glitch" data-text="Snow-Dump">Snow-Dump</h2>
-      <div className="snow-dump-container">
+    <div className="ai-page">
+      <h1 className="page-title neon-text">AI Image Generation</h1>
+      <div className="content-wrapper">
         <div className="input-panel">
-          <select
-            value={selectedModel}
-            onChange={(e) => setSelectedModel(e.target.value)}
-            className="model-select neon-border"
-          >
-            <option value="flux-dev">Flux Dev</option>
-            <option value="fal-flux-schnell">Flux Schnell</option>
-            <option value="fal-sd-v3-medium">Stable Diffusion v3</option>
-            <option value="fal-flux-realism">Flux Realism</option>
-            <option value="fal-ai/flux-lora">Flux LoRA</option>
-            <option value="fal-ai/flux/dev/image-to-image">Image to Image</option>
-          </select>
-          <ImageUploader onImagesSelected={handleImagesSelected} />
-          <textarea
-            value={imageInput}
-            onChange={(e) => setImageInput(e.target.value)}
-            placeholder="Describe the image you want to generate..."
-            className="prompt-input neon-border"
-          />
-          <button onClick={handleImageSubmit} disabled={isLoading} className="generate-button neon-border">
-            {isLoading ? 'Generating...' : 'Generate Image'}
-          </button>
+          <form onSubmit={handleSubmit} className="cyberpunk-form">
+            <div className="form-group">
+              <label htmlFor="prompt-input" className="neon-text">Prompt:</label>
+              <textarea
+                id="prompt-input"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Describe your cyberpunk vision..."
+                required
+                className="cyberpunk-input"
+              />
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="model-select" className="neon-text">Model:</label>
+                <select
+                  id="model-select"
+                  value={selectedModel}
+                  onChange={(e) => setSelectedModel(e.target.value)}
+                  className="cyberpunk-select"
+                >
+                  {models.map((model) => (
+                    <option key={model.value} value={model.value}>{model.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="image-size" className="neon-text">Size:</label>
+                <select
+                  id="image-size"
+                  value={imageSize}
+                  onChange={(e) => setImageSize(e.target.value)}
+                  className="cyberpunk-select"
+                >
+                  <option value="square_hd">Square HD</option>
+                  <option value="square">Square</option>
+                  <option value="portrait_4_3">Portrait 4:3</option>
+                  <option value="portrait_16_9">Portrait 16:9</option>
+                  <option value="landscape_4_3">Landscape 4:3</option>
+                  <option value="landscape_16_9">Landscape 16:9</option>
+                </select>
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="inference-steps" className="neon-text">Inference Steps:</label>
+                <input
+                  type="number"
+                  id="inference-steps"
+                  value={inferenceSteps}
+                  onChange={(e) => setInferenceSteps(Number(e.target.value))}
+                  min="1"
+                  max="100"
+                  className="cyberpunk-input"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="guidance-scale" className="neon-text">Guidance Scale:</label>
+                <input
+                  type="number"
+                  id="guidance-scale"
+                  value={guidanceScale}
+                  onChange={(e) => setGuidanceScale(Number(e.target.value))}
+                  min="1"
+                  max="20"
+                  step="0.1"
+                  className="cyberpunk-input"
+                />
+              </div>
+            </div>
+            <div className="form-group checkbox-group">
+              <label htmlFor="nsfw-toggle" className="neon-text">
+                <input
+                  type="checkbox"
+                  id="nsfw-toggle"
+                  checked={nsfwAllowed}
+                  onChange={(e) => setNsfwAllowed(e.target.checked)}
+                  className="cyberpunk-checkbox"
+                />
+                Allow NSFW Content
+              </label>
+            </div>
+            <button type="submit" disabled={loading} className="cyberpunk-button">
+              {loading ? 'Generating...' : 'Generate Image'}
+            </button>
+          </form>
         </div>
         <div className="output-panel">
-          {isLoading && <div className="loading">Generating image...</div>}
-          {error && <div className="error">{error}</div>}
-          {imageOutput && (
-            <img src={imageOutput} alt="AI Generated" className="generated-image neon-border" />
+          {error && <div className="error neon-text">{error}</div>}
+          {nsfwDetected && (
+            <div className="warning neon-text">
+              NSFW content may be present in the generated image.
+            </div>
+          )}
+          {generatedImage && (
+            <div className="image-container">
+              <div className="large-image-display">
+                <img src={generatedImage} alt="Generated" className="generated-image neon-border" />
+              </div>
+              <a href={generatedImage} target="_blank" rel="noopener noreferrer" className="image-link neon-text">
+                View Full Image
+              </a>
+            </div>
           )}
         </div>
       </div>
@@ -96,4 +165,4 @@ function SnowDump() {
   );
 }
 
-export default SnowDump;
+export default AIPage;

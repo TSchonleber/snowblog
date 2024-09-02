@@ -18,7 +18,7 @@ function Login() {
       console.log('Attempting login with:', { email, password });
       const response = await api.post('/auth/login', { email, password });
       console.log('Login response:', response.data);
-      login(response.data.user);
+      await login(response.data.user);
       navigate('/');
     } catch (error) {
       console.error('Login error:', error.response || error);

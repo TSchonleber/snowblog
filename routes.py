@@ -197,6 +197,51 @@ def ai_text_response():
         logging.error(f"Traceback: {traceback.format_exc()}")
         return jsonify({"error": f"Failed to generate text: {str(e)}"}), 500
 
+import os
+from flask import jsonify, request, current_app
+from werkzeug.utils import secure_filename
+import requests
+from openai import OpenAI
+from ai_utils import *
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Define fal_model_mapping here
+fal_model_mapping = {
+    "flux-dev": "fal-ai/flux",
+    "fal-flux-schnell": "fal-ai/flux/schnell",
+    "fal-sd-v3-medium": "fal-ai/stable-diffusion-v3-medium",
+    "fal-flux-realism": "fal-ai/flux-realism",
+    "fal-ai/flux-lora": "fal-ai/flux-lora",
+    "fal-ai/flux/dev/image-to-image": "fal-ai/flux/dev/image-to-image"
+}
+
+@bp.route('/api/generate-image', methods=['POST'])
+def generate_image():
+    data = request.json
+    prompt = data.get('prompt')
+    model = data.get('model', 'flux-dev')
+    image_size = data.get('image_size', 'landscape_16_9')
+    inference_steps = int(data.get('inference_steps', 50))
+    guidance_scale = float(data.get('guidance_scale', 7.5))
+    nsfw_allowed = data.get('nsfw_allowed', False)
+    
+    print(f"Received request: prompt={prompt}, model={model}, size={image_size}, steps={inference_steps}, guidance={guidance_scale}, nsfw_allowed={nsfw_allowed}")
+    
+    if not prompt:
+        return jsonify({'error': 'No prompt provided'}), 400
+
+    try:
+        image_url, nsfw_detected = generate_image_fal(prompt, model, image_size, inference_steps, guidance_scale, nsfw_allowed)
+        return jsonify({'image_url': image_url, 'nsfw_detected': nsfw_detected})
+    except Exception as e:
+        error_message = str(e)
+        current_app.logger.error(f"Error generating image: {error_message}")
+        return jsonify({'error': f'An error occurred while generating the image: {error_message}'}), 500
+
 @bp.route('/api/ai/image', methods=['POST'])
 @login_required
 def ai_image_response():

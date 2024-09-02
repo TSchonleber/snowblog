@@ -24,53 +24,52 @@ client = OpenAI(api_key=openai_api_key)
 
 fal_client.api_key = os.getenv("FAL_API_KEY")
 
-def generate_image_fal(prompt, fal_model, max_steps=50):
-    print(f"Attempting to generate image with FAL AI. Model: {fal_model}, Prompt: {prompt}")
+fal_models = {
+    "flux-dev": "fal-ai/flux/dev",
+    "flux-schnell": "fal-ai/flux/schnell",
+    "sd-v3-medium": "fal-ai/stable-diffusion-v3-medium",
+    "flux-realism": "fal-ai/flux-realism",
+    "flux-lora": "fal-ai/flux-lora"
+}
+
+def generate_image_fal(prompt, model, image_size="landscape_16_9", inference_steps=50, guidance_scale=7.5, nsfw_allowed=False):
+    print(f"Generating image. Model: {model}, Prompt: {prompt}, Size: {image_size}, Steps: {inference_steps}, Guidance: {guidance_scale}, NSFW Allowed: {nsfw_allowed}")
     
     try:
+        fal_model = fal_models.get(model, "fal-ai/flux")
+        
+        arguments = {
+            "prompt": prompt,
+            "image_size": image_size,
+            "num_inference_steps": int(inference_steps),
+            "guidance_scale": float(guidance_scale),
+            "safety_checker": False,
+            "nsfw_filter": False,
+            "censor_nsfw": False,
+            "use_karras_sigmas": True,
+            "clip_skip": 2,
+            "disable_safety_checker": True,
+            "filter_nsfw": False,
+        }
+
+        print(f"Sending arguments to FAL AI: {arguments}")
+
         result = fal_client.run(
             fal_model,
-            arguments={
-                "prompt": prompt,
-                "image_size": "landscape_16_9",
-                "num_inference_steps": max_steps,
-                "guidance_scale": 7.5,
-                "enable_safety_checker": False
-            }
+            arguments=arguments,
+            timeout=120
         )
-        print(f"FAL AI result: {result}")  # Add this line for debugging
+        print(f"FAL AI result: {result}")
+        
         image_url = result['images'][0]['url']
-        response = requests.get(image_url)
-        img = Image.open(BytesIO(response.content))
-        buffered = BytesIO()
-        img.save(buffered, format="PNG")
-        img_str = base64.b64encode(buffered.getvalue()).decode()
-        return f"data:image/png;base64,{img_str}"
+        
+        # Instead of relying on 'has_nsfw_concepts', we'll assume NSFW content if nsfw_allowed is True
+        nsfw_detected = nsfw_allowed
+        
+        return image_url, nsfw_detected
     except Exception as e:
-        print(f"Error generating image with FAL AI: {str(e)}")
-        print(f"Full error details: {e.response.text if hasattr(e, 'response') else 'No additional details'}")
-        raise  # Re-raise the exception to be caught in the calling function
-
-def generate_image_openai(prompt):
-    print(f"Attempting to generate image with DALL-E. Prompt: {prompt}")
-    try:
-        response = client.images.generate(
-            model="dall-e-3",
-            prompt=prompt,
-            size="1792x1024",
-            quality="standard",
-            n=1,
-        )
-        image_url = response.data[0].url
-        response = requests.get(image_url)
-        img = Image.open(BytesIO(response.content))
-        buffered = BytesIO()
-        img.save(buffered, format="PNG")
-        img_str = base64.b64encode(buffered.getvalue()).decode()
-        return f"data:image/png;base64,{img_str}"
-    except Exception as e:
-        print(f"Error generating image with DALL-E: {str(e)}")
-        return None
+        print(f"Error generating image: {str(e)}")
+        raise
 
 def text_chat(message, history, model):
     print(f"text_chat called with message: '{message}', model: '{model}'")
@@ -102,17 +101,8 @@ def text_chat(message, history, model):
         print(f"Traceback: {traceback.format_exc()}")
         raise
 
-def generate_image(prompt, model_name, input_images=None):
+def generate_image(prompt, model_name, input_images=None,):
     print(f"generate_image called with prompt: '{prompt}', model: '{model_name}', input_images: {input_images}")
-    
-    fal_model_mapping = {
-        "flux-dev": "fal-ai/flux/dev",
-        "fal-flux-schnell": "fal-ai/flux/schnell",
-        "fal-sd-v3-medium": "fal-ai/stable-diffusion-v3-medium",
-        "fal-flux-realism": "fal-ai/flux-realism",
-        "fal-ai/flux-lora": "fal-ai/flux-lora",
-        "fal-ai/flux/dev/image-to-image": "fal-ai/flux/dev/image-to-image"
-    }
     
     if model_name in fal_model_mapping:
         fal_model = fal_model_mapping[model_name]
@@ -141,7 +131,7 @@ def generate_image(prompt, model_name, input_images=None):
     
     return image
 
-def generate_image_fal_image_to_image(prompt, fal_model, input_images, max_steps=50):
+def generate_image_fal_image_to_image(prompt, fal_model, input_images, max_steps=50,):
     print(f"Attempting to generate image with FAL AI image-to-image. Model: {fal_model}, Prompt: {prompt}")
     
     try:
@@ -160,7 +150,6 @@ def generate_image_fal_image_to_image(prompt, fal_model, input_images, max_steps
                 "image_size": "landscape_16_9",
                 "num_inference_steps": max_steps,
                 "guidance_scale": 7.5,
-                "enable_safety_checker": False
             },
             timeout=60  # Add a timeout of 60 seconds
         )
