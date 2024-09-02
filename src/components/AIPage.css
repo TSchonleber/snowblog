@@ -1,5 +1,5 @@
 .ai-page {
-  max-width: 1600px;  /* Increased max-width */
+  max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
   color: var(--text-color);
@@ -13,11 +13,11 @@
 
 .content-wrapper {
   display: flex;
-  gap: 40px;  /* Increased gap */
+  gap: 30px;
 }
 
-.input-panel {
-  flex: 0 0 25%;  /* Reduced width */
+.control-panel {
+  flex: 0 0 35%;
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   padding: 20px;
@@ -25,7 +25,7 @@
 }
 
 .output-panel {
-  flex: 0 0 70%;  /* Increased width */
+  flex: 0 0 65%;
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   padding: 20px;
@@ -38,21 +38,18 @@
 .cyberpunk-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 5px;
-}
-
-.form-row {
-  display: flex;
-  gap: 20px;
-}
-
-.form-row .form-group {
   flex: 1;
 }
 
@@ -78,30 +75,10 @@ textarea.cyberpunk-input {
 .checkbox-group {
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
 .cyberpunk-checkbox {
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--primary-color);
-  border-radius: 4px;
-  background-color: transparent;
-  display: inline-block;
-  position: relative;
   margin-right: 10px;
-  cursor: pointer;
-}
-
-.cyberpunk-checkbox:checked::before {
-  content: '✓';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--primary-color);
-  font-size: 16px;
 }
 
 .cyberpunk-button {
@@ -126,31 +103,88 @@ textarea.cyberpunk-input {
 }
 
 .image-container {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  min-height: 400px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
   width: 100%;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(0, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 20px;
+  font-size: 1.2em;
+  text-align: center;
+}
+
+.placeholder-text {
+  font-size: 1.2em;
+  text-align: center;
+}
+
+.large-image-display {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .generated-image {
   max-width: 100%;
-  height: auto;
+  max-height: 100%;
+  object-fit: contain;
   border-radius: 5px;
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
 }
 
 .image-link {
-  text-decoration: none;
+  margin-top: 10px;
   padding: 5px 10px;
-  border: 1px solid var(--primary-color);
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  text-decoration: none;
   border-radius: 5px;
   transition: all 0.3s ease;
 }
 
 .image-link:hover {
-  background-color: var(--primary-color);
-  color: var(--background-color);
+  background-color: var(--accent-color);
+  box-shadow: 0 0 10px var(--primary-color);
 }
 
 .error, .warning {
@@ -171,20 +205,51 @@ textarea.cyberpunk-input {
   border: 1px solid #ffff00;
 }
 
-/* Add this new style for a larger image display */
-.large-image-display {
+.uploaded-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.image-preview {
+  position: relative;
   width: 100%;
-  height: 70vh;  /* Set the height to 70% of the viewport height */
+  padding-bottom: 100%; /* 1:1 Aspect Ratio */
+  border: 2px solid var(--primary-color);
+  border-radius: 5px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.image-preview img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-preview.selected {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 10px var(--accent-color);
+}
+
+.selection-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 255, 255, 0.3);
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
-}
-
-.large-image-display img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--background-color);
 }
 
 @media (max-width: 1200px) {
@@ -192,12 +257,8 @@ textarea.cyberpunk-input {
     flex-direction: column;
   }
   
-  .input-panel, .output-panel {
+  .control-panel, .output-panel {
     flex: 1;
     width: 100%;
-  }
-
-  .large-image-display {
-    height: 50vh;  /* Adjust for smaller screens */
   }
 }

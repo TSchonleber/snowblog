@@ -221,21 +221,22 @@ fal_model_mapping = {
 
 @bp.route('/api/generate-image', methods=['POST'])
 def generate_image():
-    data = request.json
-    prompt = data.get('prompt')
-    model = data.get('model', 'flux-dev')
-    image_size = data.get('image_size', 'landscape_16_9')
-    inference_steps = int(data.get('inference_steps', 50))
-    guidance_scale = float(data.get('guidance_scale', 7.5))
-    nsfw_allowed = data.get('nsfw_allowed', False)
+    prompt = request.form.get('prompt')
+    model = request.form.get('model', 'flux-dev')
+    image_size = request.form.get('image_size', 'landscape_16_9')
+    inference_steps = int(request.form.get('inference_steps', 50))
+    guidance_scale = float(request.form.get('guidance_scale', 7.5))
+    nsfw_allowed = request.form.get('nsfw_allowed', 'false').lower() == 'true'
+    
+    input_images = request.files.getlist('images')
     
     print(f"Received request: prompt={prompt}, model={model}, size={image_size}, steps={inference_steps}, guidance={guidance_scale}, nsfw_allowed={nsfw_allowed}")
     
-    if not prompt:
-        return jsonify({'error': 'No prompt provided'}), 400
+    if not prompt and not input_images:
+        return jsonify({'error': 'No prompt or input images provided'}), 400
 
     try:
-        image_url, nsfw_detected = generate_image_fal(prompt, model, image_size, inference_steps, guidance_scale, nsfw_allowed)
+        image_url, nsfw_detected = generate_image_fal(prompt, model, image_size, inference_steps, guidance_scale, nsfw_allowed, input_images)
         return jsonify({'image_url': image_url, 'nsfw_detected': nsfw_detected})
     except Exception as e:
         error_message = str(e)

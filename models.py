@@ -18,6 +18,7 @@ class User(UserMixin, db.Model):
     website = db.Column(db.String(200), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     avatar_url = db.Column(db.String(200), nullable=True)
+    user_images = db.relationship('UserImage', backref='owner', lazy='dynamic')
 
     def __init__(self, username, email, is_approved=False, is_admin=False):
         self.username = username
@@ -71,3 +72,9 @@ class Post(db.Model):
                 'display_name': self.author.display_name
             }
         }
+
+class UserImage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    image_url = db.Column(db.String(200), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

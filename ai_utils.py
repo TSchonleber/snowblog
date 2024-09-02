@@ -32,25 +32,42 @@ fal_models = {
     "flux-lora": "fal-ai/flux-lora"
 }
 
-def generate_image_fal(prompt, model, image_size="landscape_16_9", inference_steps=50, guidance_scale=7.5, nsfw_allowed=False):
+def generate_image_fal(prompt, model, image_size="landscape_16_9", inference_steps=50, guidance_scale=20, nsfw_allowed=True, input_image_ids=None):
     print(f"Generating image. Model: {model}, Prompt: {prompt}, Size: {image_size}, Steps: {inference_steps}, Guidance: {guidance_scale}, NSFW Allowed: {nsfw_allowed}")
     
     try:
         fal_model = fal_models.get(model, "fal-ai/flux")
         
+        inference_steps = min(int(inference_steps), 50)
+        guidance_scale = min(float(guidance_scale), 20.0)
+        
         arguments = {
             "prompt": prompt,
             "image_size": image_size,
-            "num_inference_steps": int(inference_steps),
-            "guidance_scale": float(guidance_scale),
-            "safety_checker": False,
-            "nsfw_filter": False,
-            "censor_nsfw": False,
+            "num_inference_steps": inference_steps,
+            "guidance_scale": guidance_scale,
+            "num_images": 1,
             "use_karras_sigmas": True,
+            "sync_mode": True,
             "clip_skip": 2,
-            "disable_safety_checker": True,
-            "filter_nsfw": False,
+            "enable_safety_checker": False,
         }
+
+        if model == "fal-ai/flux/dev/image-to-image" and input_image_ids:
+            input_images = UserImage.query.filter(UserImage.id.in_(input_image_ids)).all()
+            if input_images:
+                primary_image = input_images[0]
+                with open(os.path.join(current_app.config['UPLOAD_FOLDER'], primary_image.image_url.split('/')[-1]), "rb") as image_file:
+                    image_data = base64.b64encode(image_file.read()).decode('utf-8')
+                arguments["image_url"] = f"data:image/png;base64,{image_data}"
+                
+                if len(input_images) > 1:
+                    control_images = []
+                    for img in input_images[1:]:
+                        with open(os.path.join(current_app.config['UPLOAD_FOLDER'], img.image_url.split('/')[-1]), "rb") as image_file:
+                            img_data = base64.b64encode(image_file.read()).decode('utf-8')
+                        control_images.append(f"data:image/png;base64,{img_data}")
+                    arguments["control_images"] = control_images
 
         print(f"Sending arguments to FAL AI: {arguments}")
 
@@ -62,8 +79,6 @@ def generate_image_fal(prompt, model, image_size="landscape_16_9", inference_ste
         print(f"FAL AI result: {result}")
         
         image_url = result['images'][0]['url']
-        
-        # Instead of relying on 'has_nsfw_concepts', we'll assume NSFW content if nsfw_allowed is True
         nsfw_detected = nsfw_allowed
         
         return image_url, nsfw_detected
@@ -148,8 +163,11 @@ def generate_image_fal_image_to_image(prompt, fal_model, input_images, max_steps
                 "prompt": prompt,
                 "image_url": f"data:image/png;base64,{image_data}",
                 "image_size": "landscape_16_9",
+                "sync_mode": True,
+                "strength": 0.95,
                 "num_inference_steps": max_steps,
                 "guidance_scale": 7.5,
+                "enable_safety_checker": False,
             },
             timeout=60  # Add a timeout of 60 seconds
         )

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../api/axios';
+import axios from 'axios';
 import './Login.css';
 
 function Login() {
@@ -16,7 +16,7 @@ function Login() {
     setError('');
     try {
       console.log('Attempting login with:', { email, password });
-      const response = await api.post('/auth/login', { email, password });
+      const response = await axios.post('/auth/login', { email, password });
       console.log('Login response:', response.data);
       await login(response.data.user);
       navigate('/');
